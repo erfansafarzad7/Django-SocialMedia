@@ -30,7 +30,7 @@ class UserRegisterView(View):
             try:
                 User.objects.create_user(cd['username'], cd['email'], cd['password1'])
                 messages.success(request, 'Registered Successfully !', 'success')
-                return redirect('home:home')
+                return redirect('accounts:user_login')
             except IntegrityError as e:
                 messages.warning(request, 'Username Already Exist !', 'warning')
                 return render(request, self.temp_name, {'form': form})
@@ -69,4 +69,10 @@ class UserLogoutView(LoginRequiredMixin, View):
         logout(request)
         messages.success(request, 'Loged out Successfully', 'success')
         return redirect('home:home')
+
+
+class UserProfileView(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        user = User.objects.get(pk=user_id)
+        return render(request, 'accounts/profile.html', {'user': user})
 
