@@ -1,14 +1,40 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from .forms import UserRegisForm
+from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 class RegisterView(View):
+    form_class = UserRegisForm
+    temp_name = 'accounts/register.html'
+
     def get(self, request):
         form = UserRegisForm()
-        return render(request, 'accounts/register.html', {'form': form})
+        return render(request, self.temp_name, {'form': form})
 
     def post(self, request):
-        return render(request, 'accounts/register.html')
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            User.objects.create_user(cd['username'], cd['email'], cd['password'])
+            messages.success(request, 'Registered Successfully', 'success')
+            return redirect('home:home')
+        return render(request, self.temp_name, {'form': form})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
