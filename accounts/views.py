@@ -21,7 +21,7 @@ class RegisterView(View):
             cd = form.cleaned_data
 
             try:
-                User.objects.create_user(cd['username'], cd['email'], cd['password'])
+                User.objects.create_user(cd['username'], cd['email'], cd['password1'])
                 messages.success(request, 'Registered Successfully', 'success')
                 return redirect('home:home')
             except IntegrityError as e:
