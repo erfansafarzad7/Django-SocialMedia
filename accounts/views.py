@@ -4,13 +4,19 @@ from .forms import UserRegisForm, UserLoginForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import IntegrityError
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
 class UserRegisterView(View):
     form_class = UserRegisForm
     temp_name = 'accounts/register.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home:home')
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
         form = UserRegisForm()
@@ -36,6 +42,11 @@ class UserLoginView(View):
     form_class = UserLoginForm
     temp_name = 'accounts/login.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home:home')
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         form = self.form_class()
         return render(request, self.temp_name, {'form': form})
@@ -53,4 +64,9 @@ class UserLoginView(View):
         return render(request, self.temp_name, {'form': form})
 
 
+class UserLogoutView(LoginRequiredMixin, View):
+    def get(self, request):
+        logout(request)
+        messages.success(request, 'Loged out Successfully', 'success')
+        return redirect('home:home')
 
