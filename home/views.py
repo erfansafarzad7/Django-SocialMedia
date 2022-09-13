@@ -33,7 +33,7 @@ class PostDeleteView(LoginRequiredMixin, View):
                 post.delete()
                 messages.success(request, 'Post Successfully Deleted', 'success')
             else:
-                messages.error(request, 'You Can Not Delete This Message')
+                messages.error(request, 'You Can Not Delete This Message', 'danger')
             # user = User.objects.get(pk=user_id)
             # posts = Post.objects.filter(user=user)
             # return render(request, 'accounts/profile.html', {'user': user, 'posts': posts})
@@ -47,7 +47,11 @@ class PostUpdateView(LoginRequiredMixin, View):
     form_class = PostCreateUpdateForm
 
     def setup(self, request, *args, **kwargs):
-        self.post_instance = Post.objects.get(pk=kwargs['post_id'])
+        try:
+            self.post_instance = Post.objects.get(pk=kwargs['post_id'])
+        except ObjectDoesNotExist:
+            messages.error(request, 'You Can Not Delete This Message', 'danger')
+            return redirect('accounts:user_profile', request.user.id)
         return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -61,6 +65,7 @@ class PostUpdateView(LoginRequiredMixin, View):
         post = self.post_instance
         form = self.form_class(instance=post)
         return render(request, 'home/update.html', {'form': form})
+
 
     def post(self, request, *args, **kwargs):
         post = self.post_instance
