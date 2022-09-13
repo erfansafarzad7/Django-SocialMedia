@@ -5,6 +5,9 @@
     <h1 class="text-center">{{ user.username }}</h1>
 
     <div class="card">
+        {% if request.user.id == user.id %}
+            <a href="{% url 'home:post_create' %}" class="btn btn-primary"> Create </a>
+        {% endif %}
         {% for post in posts %}
             <a href="{{ post.get_absolut_url }}" class="card-body">{{ post.body|truncatewords:7 }}</a>
         {% endfor %}
