@@ -4,6 +4,7 @@
     <p><a class="" href="{% url 'accounts:user_profile' post.user.id %}">{{ post.user.username }}</a> -- {{ post.updated|date:"Y-M" }}</p>
     <p>{{ post.body }}</p>
     {% if post.user.id == request.user.id %}
-    <a class="btn btn-danger" href="{% url 'home:post_delete' post.id post.user.id %}"> Delete </a>
+    <a class="btn btn-danger" href="{% url 'home:post_delete' post.user.id post.id %}"> Delete </a>
+    <a class="btn btn-info" href="{% url 'home:post_update' post.id %}"> Update </a>
     {% endif %}
 {% endblock %}

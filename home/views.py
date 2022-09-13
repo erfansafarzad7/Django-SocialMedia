@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from .forms import PostUpdateForm
 
 
 class HomeView(View):
@@ -38,3 +39,24 @@ class PostDeleteView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             messages.warning(request, 'Page Not Found', 'warning')
             return redirect('home:home')
+
+
+class PostUpdateView(LoginRequiredMixin, View):
+    form_class = PostUpdateForm
+
+    def dispatch(self, request, *args, **kwargs):
+        post = Post.objects.get(pk=kwargs['post_id'])
+        if post.user.id != request.user.id:
+            messages.error(request, 'You Cant Edit This Message', 'danger')
+            return redirect('home:home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, post_id):
+        post = Post.objects.get(pk=post_id)
+        form = self.form_class(instance=post)
+        return render(request, 'home/update.html', {'form': form})
+
+    def post(self, request, post_id):
+        pass
+
+
