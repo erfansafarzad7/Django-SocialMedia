@@ -8,6 +8,5 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('slug', 'body')
     list_filter = ('created', 'updated')
     prepopulated_fields = {'slug': ('body',)}
-    row_id_fields = ('user',)
 
 # admin.site.register(Post, PostAdmin)

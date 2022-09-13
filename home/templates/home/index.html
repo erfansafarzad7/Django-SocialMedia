@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
 
 
-    {% block content %} <h1>Home Page</h1> {% endblock %}
+    {% block content %}
+        <h1>Home Page</h1>
+
+        <div class="card">
+            {% for post in posts %}
+                <a href="{% url 'home:post_detail' post.id post.slug %}" class="card-body">{{ post.body|truncatewords:7 }}</a>
+            {% endfor %}
+        </div>
+
+
+    {% endblock %}
 
 
 
