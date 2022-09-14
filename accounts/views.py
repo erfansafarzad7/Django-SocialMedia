@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from home.models import Post
 from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_view
 
@@ -77,7 +76,7 @@ class UserLogoutView(LoginRequiredMixin, View):
 class UserProfileView(LoginRequiredMixin, View):
     def get(self, request, user_id):
         user = User.objects.get(pk=user_id)
-        posts = Post.objects.filter(user=user)
+        posts = user.posts.all()
         return render(request, 'accounts/profile.html', {'user': user, 'posts': posts})
 
 
