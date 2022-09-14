@@ -66,7 +66,6 @@ class PostUpdateView(LoginRequiredMixin, View):
         form = self.form_class(instance=post)
         return render(request, 'home/update.html', {'form': form})
 
-
     def post(self, request, *args, **kwargs):
         post = self.post_instance
         form = self.form_class(request.POST, instance=post)
@@ -76,6 +75,7 @@ class PostUpdateView(LoginRequiredMixin, View):
             new_post.save()
             messages.success(request, 'Your Post Updated', 'success')
             return redirect('home:post_detail', post.id, post.slug)
+
 
 class PostCreateView(LoginRequiredMixin, View):
     form_class = PostCreateUpdateForm

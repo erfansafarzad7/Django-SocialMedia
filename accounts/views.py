@@ -7,6 +7,8 @@ from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from home.models import Post
+from django.urls import reverse_lazy
+from django.contrib.auth import views as auth_view
 
 
 
@@ -77,4 +79,24 @@ class UserProfileView(LoginRequiredMixin, View):
         user = User.objects.get(pk=user_id)
         posts = Post.objects.filter(user=user)
         return render(request, 'accounts/profile.html', {'user': user, 'posts': posts})
+
+
+class UserPasswordResetView(auth_view.PasswordResetView):
+    template_name = 'accounts/email/password_reset_form.html'
+    success_url = reverse_lazy('accounts:password_reset_send')
+    email_template_name = 'accounts/email/password_reset_email.html'
+
+
+class UserPasswordResetDoneView(auth_view.PasswordResetDoneView):
+    template_name = 'accounts/email/password_reset_send.html'
+
+
+class UserPasswordResetConfirmView(auth_view.PasswordResetConfirmView):
+    template_name = 'accounts/email/password_reset_confirm.html'
+    success_url = reverse_lazy('accounts:password_reset_complete')
+
+
+class UserPasswordResetCompeleteView(auth_view.PasswordResetCompleteView):
+    template_name = 'accounts/email/password_reset_complete.html'
+
 
