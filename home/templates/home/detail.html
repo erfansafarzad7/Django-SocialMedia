@@ -1,10 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p><a class="" href="{% url 'accounts:user_profile' post.user.id %}">{{ post.user.username }}</a> -- {{ post.updated|date:"Y-M" }}</p>
-    <p>{{ post.body }}</p>
+        <p><a class="" href="{% url 'accounts:user_profile' post.user.id %}">{{ post.user.username }}</a> -- {{ post.updated|date:"Y-M" }}</p>
+        <p>{{ post.body }}</p>
     {% if post.user.id == request.user.id %}
-    <a class="btn btn-danger" href="{% url 'home:post_delete' post.user.id post.id %}"> Delete </a>
-    <a class="btn btn-info" href="{% url 'home:post_update' post.id %}"> Update </a>
+        <a class="btn btn-danger" href="{% url 'home:post_delete' post.user.id post.id %}"> Delete </a>
+        <a class="btn btn-info" href="{% url 'home:post_update' post.id %}"> Update </a>
     {% endif %}
+    <hr/>
+    {% if request.user.is_authenticated %}
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input class="btn btn-info" type="submit" value="Send Comment">
+        </form>
+    {% else %}
+        <p class="alert alert-warning"> Only Logged in Users Can Comment </p>
+    {% endif %}
+    <hr/>
+    <p>{{ comments.count }} comments</p>
+    {% for comment in comments %}
+        <div class="card bg-dark text-white">
+            <p class="card-header">{{ comment.user }} | {{ comment.created|timesince }}</p>
+            <hr/>
+            <p class="card-body">{{ comment.body }}</p>
+        </div>
+    {% empty %}
+        <p> There Is No Reply For This Post.. </p>
+    {% endfor %}
 {% endblock %}
