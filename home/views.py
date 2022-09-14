@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Post
+from .models import Post, Comments
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from .forms import PostCreateUpdateForm, CommentCreateForm
+from .forms import PostCreateUpdateForm, CommentCreateForm, CommentReplyForm
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -19,6 +19,7 @@ class HomeView(View):
 
 class PostDetailView(View):
     form_class = CommentCreateForm
+    form_class_reply = CommentReplyForm
 
     def setup(self, request, *args, **kwargs):
         self.post_instance = Post.objects.get(pk=kwargs['post_id'], slug=kwargs['post_slug'])
@@ -27,7 +28,7 @@ class PostDetailView(View):
     def get(self,request, post_id, post_slug):
         try:
             comments = self.post_instance.pcomments.filter(is_reply=False)
-            return render(request, 'home/detail.html', {'post': self.post_instance, 'comments': comments, 'form': self.form_class})
+            return render(request, 'home/detail.html', {'post': self.post_instance, 'comments': comments, 'form': self.form_class, 'reply_form': self.form_class_reply})
         except ObjectDoesNotExist:
             messages.warning(request, 'Page Not Found', 'warning')
             return redirect('home:home')
@@ -114,3 +115,19 @@ class PostCreateView(LoginRequiredMixin, View):
             return redirect('home:post_detail', new_post.id, new_post.slug)
 
 
+class PostAddReplyView(LoginRequiredMixin, View):
+    form_class = CommentReplyForm
+
+    def post(self, request, post_id, comment_id):
+        post = Post.objects.get(id=post_id)
+        comment = Comments.objects.get(id=comment_id)
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.user = request.user
+            reply.post = post
+            reply.reply = comment
+            reply.is_reply = True
+            reply.save()
+            messages.success(request, 'Your Comment Submited Successfully!', 'success')
+        return redirect('home:post_detail', post.id, post.slug)

@@ -24,7 +24,25 @@
             <p class="card-header">{{ comment.user }} | {{ comment.created|timesince }}</p>
             <hr/>
             <p class="card-body">{{ comment.body }}</p>
+
+            {% if request.user.is_authenticated %}
+                <form class="" action="{% url 'home:add_reply' post.id comment.id %}" method="post">
+                    {% csrf_token %}
+                    {{ reply_form.as_p }}
+                    <input class="btn btn-info" type="submit" value="Send Reply">
+                </form>
+            {% endif %}
+
+            {% with replies=comment.rcomments.all %}
+                {% for reply in replies %}
+                <div class="card bg-secondary text-white p-2 m-2">
+                    <p class="card-body p-1 m-1"> {{ reply.user }} | {{ comment.created|timesince }}
+                    <br/><br/>{{ reply.body }} </p>
+                </div>
+                {% endfor %}
+            {% endwith %}
         </div>
+        <br/>
     {% empty %}
         <p> There Is No Reply For This Post.. </p>
     {% endfor %}
