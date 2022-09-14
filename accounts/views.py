@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_view
-
+from .models import Relation
 
 
 class UserRegisterView(View):
@@ -75,9 +75,13 @@ class UserLogoutView(LoginRequiredMixin, View):
 
 class UserProfileView(LoginRequiredMixin, View):
     def get(self, request, user_id):
+        is_following = False
         user = User.objects.get(pk=user_id)
         posts = user.posts.all()
-        return render(request, 'accounts/profile.html', {'user': user, 'posts': posts})
+        relation = Relation.objects.filter(from_user=request.user, to_user=user)
+        if relation.exists():
+            is_following = True
+        return render(request, 'accounts/profile.html', {'user': user, 'posts': posts, 'is_following': is_following})
 
 
 class UserPasswordResetView(auth_view.PasswordResetView):
@@ -97,5 +101,30 @@ class UserPasswordResetConfirmView(auth_view.PasswordResetConfirmView):
 
 class UserPasswordResetCompeleteView(auth_view.PasswordResetCompleteView):
     template_name = 'accounts/email/password_reset_complete.html'
+
+
+class UserFollowView(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        relation = Relation.objects.filter(from_user=request.user, to_user=user)
+        if relation.exists():
+            messages.warning(request, 'You Already Following This User', 'warning')
+        else:
+            Relation(from_user=request.user, to_user=user).save()
+            messages.success(request, 'You Followed This User', 'success')
+        return redirect('accounts:user_profile', user.id)
+
+
+class UserUnFollowView(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        relation = Relation.objects.filter(from_user=request.user, to_user=user)
+        if relation.exists():
+            relation.delete()
+            messages.warning(request, 'You UnFollowed This User', 'warning')
+        else:
+            messages.warning(request, "You are Not Following This User", 'warning')
+        return redirect('accounts:user_profile', user.id)
+
 
 
