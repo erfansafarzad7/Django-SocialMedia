@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import UserRegisForm, UserLoginForm
+from .forms import UserRegisForm, UserLoginForm, EditProfileForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import IntegrityError
@@ -96,7 +96,7 @@ class UserPasswordResetView(auth_view.PasswordResetView):
     email_template_name = 'accounts/email/password_reset_email.html'
 
 
-class UserPasswordResetDoneView(auth_view.PasswordResetDoneView):
+class UserPasswordResetSendView(auth_view.PasswordResetDoneView):
     template_name = 'accounts/email/password_reset_send.html'
 
 
@@ -131,6 +131,24 @@ class UserUnFollowView(LoginRequiredMixin, View):
         else:
             messages.warning(request, "You are Not Following This User", 'warning')
         return redirect('accounts:user_profile', user.id)
+
+
+class EditUserProfileView(LoginRequiredMixin, View):
+    form_class = EditProfileForm
+
+    def get(self, request):
+        form = self.form_class(instance=request.user.profile, initial={'email': request.user.email})
+        return render(request, 'accounts/edit_profile.html', {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            messages.success(request, 'Profile Successfully Edited', 'success')
+        return redirect('accounts:user_profile', request.user.id)
+
 
 
 

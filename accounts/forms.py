@@ -1,15 +1,19 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from .models import Profile
 
 
 class UserRegisForm(forms.Form):
     username = forms.CharField(max_length=25, widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password1 = forms.CharField(label='password', max_length=20, widget=forms.PasswordInput(attrs={'class': 'form-control',
-                                                                                'placeholder': 'Max: 20 char'}))
-    password2 = forms.CharField(label='Confirm Password', max_length=20, widget=forms.PasswordInput(attrs={'class': 'form-control',
-                                                                                'placeholder': 'Max: 20 char'}))
+    password1 = forms.CharField(label='password', max_length=20,
+                                widget=forms.PasswordInput(attrs={'class': 'form-control',
+                                                                  'placeholder': 'Max: 20 char'}))
+    password2 = forms.CharField(label='Confirm Password', max_length=20,
+                                widget=forms.PasswordInput(attrs={'class': 'form-control',
+                                                                  'placeholder': 'Max: 20 char'}))
+
     def clean_email(self):
         email = self.cleaned_data['email']
         user = User.objects.filter(email=email).exists()
@@ -31,3 +35,10 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(max_length=20, widget=forms.PasswordInput(attrs={'class': 'form-control',
                                                                                 'placeholder': 'Max: 20 char'}))
 
+
+class EditProfileForm(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = Profile
+        fields = ('age', 'bio')

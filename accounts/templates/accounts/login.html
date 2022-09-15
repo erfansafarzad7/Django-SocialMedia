@@ -4,10 +4,10 @@
     {% block content %}
         <h1>User Login</h1>
 
-        <form action="", method="post", class="col-md-5 col-lg-5">
+        <form action="" method="post" class="col-md-5 col-lg-5">
             {% csrf_token %}
             {{ form.as_p }}
-            <input class="btn btn-success" type="submit", value="Login">
+            <input class="btn btn-success" type="submit" value="Login">
             <br/>
             You Have No Account ?!
             <a class="btn btn-info" href="{% url 'accounts:user_register' %}"> Register </a>
