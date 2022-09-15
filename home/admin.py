@@ -16,9 +16,15 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Comments)
 class CommentsAdmin(admin.ModelAdmin):
     list_display = ('user', 'post', 'created', 'is_reply')
-    search_fields = ('user', 'body')
+    # search_fields = ('user',)
     list_filter = ('user', 'created')
     raw_id_fields = ('user', 'reply', 'post')
 
 
-admin.site.register(Vote)
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post')
+    list_filter = ('user', )
+    # search_fields = ('user', )
+
+
