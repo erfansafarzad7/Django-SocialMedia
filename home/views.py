@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Post, Comments
+from .models import Post, Comments, Vote
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -25,10 +25,17 @@ class PostDetailView(View):
         self.post_instance = Post.objects.get(pk=kwargs['post_id'], slug=kwargs['post_slug'])
         return super().setup(request, *args, **kwargs)
 
-    def get(self,request, post_id, post_slug):
+    def get(self,request, *args, **kwargs):
         try:
             comments = self.post_instance.pcomments.filter(is_reply=False)
-            return render(request, 'home/detail.html', {'post': self.post_instance, 'comments': comments, 'form': self.form_class, 'reply_form': self.form_class_reply})
+            # can_like = False
+            # if request.user.is_authenticated and self.post_instance.user_can_like(request.user):
+            #     can_like = True
+            return render(request, 'home/detail.html', {'post': self.post_instance,
+                                                        'comments': comments,
+                                                        'form': self.form_class,
+                                                        'reply_form': self.form_class_reply, })
+                                                        # 'can_like': can_like
         except ObjectDoesNotExist:
             messages.warning(request, 'Page Not Found', 'warning')
             return redirect('home:home')
@@ -131,3 +138,19 @@ class PostAddReplyView(LoginRequiredMixin, View):
             reply.save()
             messages.success(request, 'Your Comment Submited Successfully!', 'success')
         return redirect('home:post_detail', post.id, post.slug)
+
+
+class PostLikeView(LoginRequiredMixin, View):
+    def get(self, request, post_id):
+        post = Post.objects.get(id=post_id)
+        like = Vote.objects.filter(post=post, user=request.user)
+        if like.exists():
+            like.delete()
+            messages.warning(request, 'You Unliked This Post!', 'warning')
+            # messages.error(request, 'You Have Already Like This Post!', 'danger')
+        else:
+            Vote.objects.create(post=post, user=request.user)
+            messages.success(request, 'You Liked This Post!', 'success')
+        return redirect('home:post_detail', post.id, post.slug)
+
+
