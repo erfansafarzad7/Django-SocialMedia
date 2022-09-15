@@ -10,7 +10,7 @@
     <hr/>
     {% if request.user.is_authenticated %}
 
-        {#}<a href="{% url 'home:post_like' post.id %}" class="{% if can_like %} disable {% endif %}btn btn-info col-md-2"> Like {{ post.likes_count }} </a>{#}
+<!--        {#}<a href="{% url 'home:post_like' post.id %}" class="{% if can_like %} disable {% endif %}btn btn-info col-md-2"> Like {{ post.likes_count }} </a>{#}-->
         <a href="{% url 'home:post_like' post.id %}" class="btn btn-info col-md-2"> Like {{ post.likes_count }} </a>
 
         <form action="" method="post">

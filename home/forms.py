@@ -21,3 +21,9 @@ class CommentReplyForm(forms.ModelForm):
     class Meta:
         model = Comments
         fields = ('body',)
+
+
+class PostSearchForm(forms.Form):
+    search = forms.CharField()
+
+

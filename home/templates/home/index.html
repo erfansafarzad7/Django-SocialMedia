@@ -2,7 +2,12 @@
 
 
     {% block content %}
-        <h1>Home Page</h1>
+        <form action="" method="get">
+            {{ form.as_p }}
+            <input class="btn btn-secondary col-md-2" type="submit" value="Search">
+        </form>
+        <br>
+        <br>
 
         <div class="card">
             {% for post in posts %}
